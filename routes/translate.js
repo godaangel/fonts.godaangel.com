@@ -3,9 +3,10 @@ let router = express.Router();
 var fs = require('fs');
 let Render = require('../libs/render');
 const fg = require('../libs/fonts2/fontGenerate');
+var log = require('../libs/log').getLogger(__filename);
 
 router.get('/fonts', function(req, res, next) {
-
+  
   var cwd = process.cwd();
   var svg1 = {
     file: 'public/upload/ic_play_list.svg'
@@ -20,6 +21,7 @@ router.get('/fonts', function(req, res, next) {
     outPath: 'public/fonts'
   }, function(err, file) {
     if (err) {
+      log.error(err);
       Render.err(res, err);
       throw err;
     }
@@ -28,7 +30,7 @@ router.get('/fonts', function(req, res, next) {
         url: file
       });
     } else {
-      Render.err(res);
+      Render.err(res, 'generateFont 没有找到文件!');
     }
   })
 

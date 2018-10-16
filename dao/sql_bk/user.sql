@@ -1,4 +1,4 @@
-use user_center;
+use font_center;
 create table user
 (
   id int auto_increment comment '用户ID' primary key,

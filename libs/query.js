@@ -1,6 +1,7 @@
-let mysql = require('mysql')
-let dbConfig = require('../config/database')
-let pool = mysql.createPool(dbConfig.mysql)
+const mysql = require('mysql')
+const config = require('config');
+const pool = mysql.createPool(config.get('mysql'))
+const log = require('./log').getLogger(__filename);
 
 let Query = function(...args) {
   return new Promise((resolve, reject) => {
@@ -8,6 +9,7 @@ let Query = function(...args) {
       try {
         connection.query(args[0], args[1] || [], function(err, result) {
           if (err) {
+            log.error(err)
             reject(err)
           }
           if (result) {
@@ -16,6 +18,7 @@ let Query = function(...args) {
           connection.release()
         })
       }catch(e) {
+        log.error(e)
         reject(e)
       }
     })

@@ -1,3 +1,5 @@
+const log = require('./log').getLogger(__filename);
+
 /**
  * 对返回值进行处理的函数
  * @Author   warrenyang@tencent.com
@@ -18,7 +20,8 @@ class Render {
 	}
 
 	static err(res, content, errCode, type = 'json') {
-		console.log('【Error】', content)
+		// console.log('【Error】', content)
+		log.error(content)
 		// 此处留个疑问，如何全部展示出content报错内容
 		res[type]({
 			ret: 1,
