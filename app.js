@@ -12,6 +12,7 @@ var usersRouter = require('./routes/users');
 var uploadRouter = require('./routes/upload');
 var translateRouter = require('./routes/translate');
 var fontRouter = require('./routes/font');
+var projectRouter = require('./routes/project');
 
 var app = express();
 
@@ -51,11 +52,9 @@ app.use('/upload', function(req, res, next){
 	next()
 })
 app.use('/upload', uploadRouter);
-
 app.use('/translate', translateRouter);
-
 app.use('/font', fontRouter);
-
+app.use('/project', projectRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
