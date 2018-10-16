@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="23px" height="23px" viewBox="0 0 23 23" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 50 (54983) - http://www.bohemiancoding.com/sketch -->
+    <title>01d</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <polygon id="path-1" points="0 23 23 23 23 0 0 0"></polygon>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="天气icon" transform="translate(-6.000000, -7.000000)">
+            <g id="Group" transform="translate(6.000000, 7.000000)">
+                <g id="01d">
+                    <path d="M11.5,16 C9.019,16 7,13.981 7,11.5 C7,9.019 9.019,7 11.5,7 C13.981,7 16,9.019 16,11.5 C16,13.981 13.981,16 11.5,16 M11.5,5.5 C8.187,5.5 5.5,8.187 5.5,11.5 C5.5,14.813 8.187,17.5 11.5,17.5 C14.813,17.5 17.5,14.813 17.5,11.5 C17.5,8.187 14.813,5.5 11.5,5.5" id="Fill-1" fill="#FFFFFF"></path>
+                    <mask id="mask-2" fill="white">
+                        <use xlink:href="#path-1"></use>
+                    </mask>
+                    <g id="Clip-4"></g>
+                    <polygon id="Fill-3" fill="#FFFFFF" mask="url(#mask-2)" points="10.75 4 12.25 4 12.25 0 10.75 0"></polygon>
+                    <polygon id="Fill-5" fill="#FFFFFF" mask="url(#mask-2)" points="6.6826 5.6846 3.8546 2.8566 2.7936 3.9166 5.6216 6.7456"></polygon>
+                    <polygon id="Fill-6" fill="#FFFFFF" mask="url(#mask-2)" points="0 12.312 4 12.312 4 10.812 0 10.812"></polygon>
+                    <polygon id="Fill-7" fill="#FFFFFF" mask="url(#mask-2)" points="2.7939 19.208 3.8549 20.269 6.6829 17.44 5.6219 16.38"></polygon>
+                    <polygon id="Fill-8" fill="#FFFFFF" mask="url(#mask-2)" points="10.75 23 12.25 23 12.25 19 10.75 19"></polygon>
+                    <polygon id="Fill-9" fill="#FFFFFF" mask="url(#mask-2)" points="16.3174 17.4404 19.1454 20.2684 20.2064 19.2084 17.3784 16.3794"></polygon>
+                    <polygon id="Fill-10" fill="#FFFFFF" mask="url(#mask-2)" points="19 12.312 23 12.312 23 10.812 19 10.812"></polygon>
+                    <polygon id="Fill-11" fill="#FFFFFF" mask="url(#mask-2)" points="20.2061 3.917 19.1451 2.856 16.3171 5.685 17.3781 6.745"></polygon>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
