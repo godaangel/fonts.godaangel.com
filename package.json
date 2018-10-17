@@ -29,7 +29,7 @@
     "mysql": "^2.15.0",
     "svg2ttf": "^4.0.2",
     "svgicons2svgfont": "^5.0.0",
-    "svgo": "^0.5.0",
+    "svgo": "^1.1.1",
     "temp": "^0.8.3",
     "ttf2eot": "^2.0.0",
     "ttf2woff": "^2.0.1",

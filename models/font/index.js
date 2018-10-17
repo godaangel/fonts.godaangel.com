@@ -4,8 +4,8 @@
  */
 // 引入查询模块
 let Query = require('../../libs/query')
-
 let Base = require('../base/index')
+let lodash = require('lodash')
 
 class Font extends Base{
 	constructor() {
@@ -15,10 +15,11 @@ class Font extends Base{
 
 	insert(params){
 		let timestamp = new Date().getTime()
-		return super.insert({
+		params = lodash.merge(params, {
       create_time: timestamp,
       update_time: timestamp
 		})
+		return super.insert(params)
 	}
 }
 

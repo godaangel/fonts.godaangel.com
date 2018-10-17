@@ -51,7 +51,7 @@ const createSvg = (iconDefaultcfg) => {
 
   for (let i in iconDefaultcfg.charmap) {
     let charConfig = iconDefaultcfg.charmap[i];
-    const glyph = fs.createReadStream(charConfig.file);
+    const glyph = fs.createReadStream('public' + charConfig.file);
 
     const basename = path.basename(charConfig.file);
     const matches = basename.match(/^(?:((?:u[0-9a-f]{4,6},?)+)-)?(.+)\.svg$/i);
@@ -267,7 +267,7 @@ const createDemoZip = (outputDir, done) => {
         return done(err);
       }
       UTIL.deleteFolder(outputDir);
-      return done(null, `/download/${dayFlag}/${zipDir}/${iconfontName}.zip`);
+      return done(null, `/fonts/${dayFlag}/${zipDir}/${iconfontName}.zip`);
     });
   });
 }
@@ -315,7 +315,7 @@ const generateFont = (options, done) => {
   const file = path.resolve(outputDir + '/fonts/', `${iconDefaultcfg.fontfileName}.svg`);
   fontStream = new SVGIcons2SVGFontStream({
     fontName: 'ifont',
-    normalize: false
+    normalize: true
   })
 
   /*

@@ -9,10 +9,10 @@ router.get('/fonts', function(req, res, next) {
   
   var cwd = process.cwd();
   var svg1 = {
-    file: 'public/upload/ic_play_list.svg'
+    file: '/upload/compass.svg'
   }
   var svg2 = {
-    file: 'public/upload/ic_time_list1x.svg'
+    file: '/upload/ic_time_list1x.svg'
   }
 
   fg.generateFont({

@@ -7,3 +7,6 @@ create table project
   update_time varchar(255) comment '更新时间'
 )
 comment '项目组列表';
+
+ALTER TABLE `font_center`.`project` 
+ADD COLUMN `icons_id` TEXT NULL AFTER `update_time`;
