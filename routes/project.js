@@ -32,12 +32,11 @@ router.get('/list', function(req, res, next) {
 router.post('/add', function(req, res, next) {
   let project = new Project();
 
-  let { name, icons_id } = req.body;
+  let { name } = req.body;
 
   let addProject = async function() {
     let info = await project.insert({
-      name: name,
-      icons_id: icons_id
+      name: name
     });
     Render.success(res, info);
   }
@@ -64,7 +63,7 @@ router.post('/update', function(req, res, next) {
     if(info.affectedRows){
       Render.success(res, info)
     }else{
-      Render.err(res, '没有找到该用户')
+      Render.err(res, '没有找到该项目')
     }
   }
 
@@ -73,4 +72,20 @@ router.post('/update', function(req, res, next) {
   });
 
 });
+
+router.post('/delete', function(req, res, next) {
+  let project = new Project();
+
+  let { id } = req.body;
+
+  let updateProject = async function() {
+    let info = await project.delete(id);
+    Render.success(res, info)
+  }
+
+  updateProject().catch((err) => {
+    Render.err(res, err);
+  });
+});
+
 module.exports = router;

@@ -10,7 +10,8 @@ var storage = multer.diskStorage({
   },
   //给上传文件重命名，获取添加后缀名
   filename: function(req, file, cb) {
-    cb(null, file.originalname);
+    var fileFormat = (file.originalname).split(".");
+    cb(null, fileFormat[0] + '-' + Date.now() + "." + fileFormat[fileFormat.length - 1]);
   }
 })
 let upload = multer({
@@ -22,7 +23,7 @@ router.post('/upload', upload.single('file'), function(req, res, next) {
   Render.success(res, {
     src: url,
     file: '/uploads/' + req.file.filename,
-    name: req.file.filename
+    name: req.file.filename.split('-')[0]
   })
 })
 

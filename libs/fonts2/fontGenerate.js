@@ -58,13 +58,13 @@ const createSvg = (iconDefaultcfg) => {
     let unicode = String.fromCodePoint(startUicode);
     iconDefaultcfg.charmap[i] = {
       cssCode: `${UTIL.encodeUnicode(unicode)}`,
-      name: matches[2]
+      name: matches[2].split('-')[0]
     }
     startUicode++;
 
     glyph.metadata = {
       unicode: [unicode],
-      name: matches[2]
+      name: matches[2].split('-')[0]
     };
     fontStream.write(glyph);
   }
