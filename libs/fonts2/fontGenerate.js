@@ -8,6 +8,11 @@ const ttf2eot = require('ttf2eot');
 const ttf2woff2 = require('ttf2woff2');
 const jsZip = require('jszip');
 const UTIL = require('./utils');
+const SVGO = require('svgo');
+var log = require('../log').getLogger(__filename);
+const MemoryStream = require('memorystream');
+const webfontsGenerator = require('webfonts-generator');
+
 
 const SVGIcons2SVGFontStream = require('svgicons2svgfont');
 const UNICODE_PUA_START = 0xF101; //初始unicode源值
@@ -38,21 +43,136 @@ const ScanList = (list) => {
 };
 
 /**
+ * 压缩svg
+ * @Author   Warrenyang
+ * @DateTime 2018-10-19
+ * @param    {Object}   iconDefaultcfg 默认配置
+ * @return   {[type]}                  [description]
+ */
+const optimizeSvg = (iconDefaultcfg) => {
+  iconDefaultcfg = iconDefaultcfg || {};
+  var svgo = new SVGO();
+  var files = [];
+
+  for (let i in iconDefaultcfg.charmap) {
+    files.push('public' + iconDefaultcfg.charmap[i].file);
+  }
+
+  async.map(files, function(file, fileDone) {
+    var svg = fs.readFileSync(file, 'utf8');
+    var svgo = new SVGO({
+        plugins: [{
+          minifyStyles: false
+        }, {
+          cleanupAttrs: false,
+        }, {
+          removeDoctype: false,
+        },{
+          removeXMLProcInst: false,
+        },{
+          removeComments: false,
+        },{
+          removeMetadata: false,
+        },{
+          removeTitle: false,
+        },{
+          removeDesc: false,
+        },{
+          removeUselessDefs: false,
+        },{
+          removeEditorsNSData: false,
+        },{
+          removeEmptyAttrs: false,
+        },{
+          removeHiddenElems: false,
+        },{
+          removeEmptyText: false,
+        },{
+          removeEmptyContainers: false,
+        },{
+          removeViewBox: false,
+        },{
+          cleanupEnableBackground: false,
+        },{
+          convertStyleToAttrs: false,
+        },{
+          convertColors: false,
+        },{
+          convertPathData: false,
+        },{
+          convertTransform: false,
+        },{
+          removeUnknownsAndDefaults: false,
+        },{
+          removeNonInheritableGroupAttrs: false,
+        },{
+          removeUselessStrokeAndFill: false,
+        },{
+          removeUnusedNS: false,
+        },{
+          cleanupIDs: false,
+        },{
+          cleanupNumericValues: false,
+        },{
+          moveElemsAttrsToGroup: false,
+        },{
+          moveGroupAttrsToElems: false,
+        },{
+          collapseGroups: false,
+        },{
+          removeRasterImages: false,
+        },{
+          mergePaths: false,
+        },{
+          convertShapeToPath: false,
+        },{
+          sortAttrs: false,
+        },{
+          removeDimensions: false,
+        }]
+      });
+    try {
+      svgo.optimize(svg).then(function(res) {
+        var stream = new MemoryStream(res.data, {
+          writable: false
+        });
+        console.log(svg)
+        console.log(stream.toString());
+
+        fileDone(null, {
+          stream: stream
+        });
+      });
+    } catch (err) {
+      console.log(err);
+      fileDone(err);
+    }
+  }, function(err, streams) {
+    if (err) {
+      log.error('Can’t simplify SVG file with SVGO.\n\n' + err);
+    } else {
+      createSvg(streams, iconDefaultcfg);
+    }
+  });
+}
+
+/**
  * 创建svg文件
  * @Author   Warrenyang
- * @DateTime 2018-10-16
- * @version  [version]
+ * @DateTime 2018-10-19
+ * @param    {Array}    streams        文件流
  * @param    {Object}   iconDefaultcfg 默认配置
  */
-const createSvg = (iconDefaultcfg) => {
+const createSvg = (streams, iconDefaultcfg) => {
   iconDefaultcfg = iconDefaultcfg || {};
 
   let startUicode = UNICODE_PUA_START; //设置字体起始code
 
-  for (let i in iconDefaultcfg.charmap) {
+  for (let i in streams) {
     let charConfig = iconDefaultcfg.charmap[i];
-    const glyph = fs.createReadStream('public' + charConfig.file);
+    const glyph = streams[i].stream;
 
+    // 通过svg2svgfont生成svg
     const basename = path.basename(charConfig.file);
     const matches = basename.match(/^(?:((?:u[0-9a-f]{4,6},?)+)-)?(.+)\.svg$/i);
     let unicode = String.fromCodePoint(startUicode);
@@ -67,9 +187,46 @@ const createSvg = (iconDefaultcfg) => {
       name: matches[2].split('-')[0]
     };
     fontStream.write(glyph);
+    // console.log(glyph)
   }
   fontStream.end();
 };
+
+/**
+ * 创建svg文件
+ * @Author   Warrenyang
+ * @DateTime 2018-10-16
+ * @version  [version]
+ * @param    {Object}   iconDefaultcfg 默认配置
+ */
+// const createSvg = (iconDefaultcfg) => {
+//   iconDefaultcfg = iconDefaultcfg || {};
+
+//   optimizeSvg(iconDefaultcfg)
+
+//   let startUicode = UNICODE_PUA_START; //设置字体起始code
+
+//   for (let i in iconDefaultcfg.charmap) {
+//     let charConfig = iconDefaultcfg.charmap[i];
+//     const glyph = fs.createReadStream('public' + charConfig.file);
+
+//     const basename = path.basename(charConfig.file);
+//     const matches = basename.match(/^(?:((?:u[0-9a-f]{4,6},?)+)-)?(.+)\.svg$/i);
+//     let unicode = String.fromCodePoint(startUicode);
+//     iconDefaultcfg.charmap[i] = {
+//       cssCode: `${UTIL.encodeUnicode(unicode)}`,
+//       name: matches[2].split('-')[0]
+//     }
+//     startUicode++;
+
+//     glyph.metadata = {
+//       unicode: [unicode],
+//       name: matches[2].split('-')[0]
+//     };
+//     fontStream.write(glyph);
+//   }
+//   fontStream.end();
+// };
 
 /**
  * 生成TTF文件
@@ -324,13 +481,17 @@ const generateFont = (options, done) => {
   fontStream.pipe(fs.createWriteStream(file))
     .on('finish', function() { // 写入成功
       console.log('Font successfully created!', path.resolve(outputDir, `${iconDefaultcfg.fontfileName}.svg`));
-      createTtf(file, outputDir, done);
+      // console.log(fs.readFileSync(file, 'utf8'))
+      // createTtf(file, outputDir, done);
     })
     .on('error', function(err) { // 写入失败
       console.log('fontStream err', err);
     });
 
-  createSvg(iconDefaultcfg);
+  // createSvg(iconDefaultcfg);
+
+  // 开始压缩svg
+  optimizeSvg(iconDefaultcfg);
 };
 
 exports.generateFont = generateFont;

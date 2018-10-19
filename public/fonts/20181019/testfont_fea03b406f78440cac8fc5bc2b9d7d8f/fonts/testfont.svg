@@ -1,0 +1,15 @@
+<?xml version="1.0" standalone="no"?> 
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" >
+<svg xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <font id="ifont" horiz-adv-x="32">
+    <font-face font-family="ifont"
+      units-per-em="32" ascent="32"
+      descent="0" />
+    <missing-glyph horiz-adv-x="0" />
+    <glyph glyph-name="ic_find_food_selected"
+      unicode="&#xF101;"
+      horiz-adv-x="32" d=" M28 16.842C28 10.215 22.627 4.842 16 4.842S4 10.215 4 16.842S9.373 28.842 16 28.842S28 23.469 28 16.842z M12.842 16.237V21.263H14.737V16.237H12.842zM23.579 21.263V23.158H10.947V16.237H9.052A0.631 0.631 0 0 1 8.42 15.605V15.139A7.14 7.14 0 0 1 22.7 15.139V15.605A0.632 0.632 0 0 1 22.068 16.237H16.63V21.263H23.577z" />
+  </font>
+</defs>
+</svg>
