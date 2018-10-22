@@ -51,9 +51,7 @@ const ScanList = (list) => {
  */
 const optimizeSvg = (iconDefaultcfg) => {
   iconDefaultcfg = iconDefaultcfg || {};
-  var svgo = new SVGO();
   var files = [];
-
   for (let i in iconDefaultcfg.charmap) {
     files.push('public' + iconDefaultcfg.charmap[i].file);
   }
@@ -61,76 +59,78 @@ const optimizeSvg = (iconDefaultcfg) => {
   async.map(files, function(file, fileDone) {
     var svg = fs.readFileSync(file, 'utf8');
     var svgo = new SVGO({
-        plugins: [{
-          minifyStyles: false
-        }, {
-          cleanupAttrs: false,
-        }, {
-          removeDoctype: false,
-        },{
-          removeXMLProcInst: false,
-        },{
-          removeComments: false,
-        },{
-          removeMetadata: false,
-        },{
-          removeTitle: false,
-        },{
-          removeDesc: false,
-        },{
-          removeUselessDefs: false,
-        },{
-          removeEditorsNSData: false,
-        },{
-          removeEmptyAttrs: false,
-        },{
-          removeHiddenElems: false,
-        },{
-          removeEmptyText: false,
-        },{
-          removeEmptyContainers: false,
-        },{
-          removeViewBox: false,
-        },{
-          cleanupEnableBackground: false,
-        },{
-          convertStyleToAttrs: false,
-        },{
-          convertColors: false,
-        },{
-          convertPathData: false,
-        },{
-          convertTransform: false,
-        },{
-          removeUnknownsAndDefaults: false,
-        },{
-          removeNonInheritableGroupAttrs: false,
-        },{
-          removeUselessStrokeAndFill: false,
-        },{
-          removeUnusedNS: false,
-        },{
-          cleanupIDs: false,
-        },{
-          cleanupNumericValues: false,
-        },{
-          moveElemsAttrsToGroup: false,
-        },{
-          moveGroupAttrsToElems: false,
-        },{
-          collapseGroups: false,
-        },{
-          removeRasterImages: false,
-        },{
-          mergePaths: false,
-        },{
-          convertShapeToPath: false,
-        },{
-          sortAttrs: false,
-        },{
-          removeDimensions: false,
-        }]
-      });
+      plugins: [{
+        cleanupAttrs: true,
+      }, {
+        removeDoctype: true,
+      }, {
+        removeXMLProcInst: true,
+      }, {
+        removeComments: true,
+      }, {
+        removeMetadata: true,
+      }, {
+        removeTitle: true,
+      }, {
+        removeDesc: true,
+      }, {
+        removeUselessDefs: true,
+      }, {
+        removeEditorsNSData: true,
+      }, {
+        removeEmptyAttrs: true,
+      }, {
+        removeHiddenElems: true,
+      }, {
+        removeEmptyText: true,
+      }, {
+        removeEmptyContainers: true,
+      }, {
+        removeViewBox: false,
+      }, {
+        cleanupEnableBackground: true,
+      }, {
+        convertStyleToAttrs: true,
+      }, {
+        convertColors: true,
+      }, {
+        convertPathData: true,
+      }, {
+        convertTransform: true,
+      }, {
+        removeUnknownsAndDefaults: true,
+      }, {
+        removeNonInheritableGroupAttrs: true,
+      }, {
+        removeUselessStrokeAndFill: true,
+      }, {
+        removeUnusedNS: true,
+      }, {
+        cleanupIDs: true,
+      }, {
+        cleanupNumericValues: true,
+      }, {
+        moveElemsAttrsToGroup: true,
+      }, {
+        moveGroupAttrsToElems: true,
+      }, {
+        collapseGroups: true,
+      }, {
+        removeRasterImages: false,
+      }, {
+        mergePaths: true,
+      }, {
+        convertShapeToPath: true,
+      }, {
+        sortAttrs: true,
+      }, {
+        removeDimensions: true,
+      }, {
+        removeAttrs: {
+          attrs: '(stroke|fill)'
+        },
+      }]
+    });
     try {
       svgo.optimize(svg).then(function(res) {
         var stream = new MemoryStream(res.data, {
@@ -378,7 +378,7 @@ const createDemoHtml = (cssTmp, outputDir, done) => {
  * @param    {Function} done      完成函数
  */
 const createDemoZip = (outputDir, done) => {
-  const zipDir = `ifont_${UTIL.UUID()}`;
+  const zipDir = `${iconfontName}_${UTIL.UUID()}`;
   const dayFlag = UTIL.format(new Date(), 'yyyyMMdd');
   const zipFullDir = `${downloadDir}/${dayFlag}/${zipDir}`;
   fs.mkdirSync(zipFullDir);
@@ -438,7 +438,11 @@ const createDemoZip = (outputDir, done) => {
  */
 const generateFont = (options, done) => {
 
-  let {files, fontName = 'wiifont', outPath} = options;
+  let {
+    files,
+    fontName = 'wiifont',
+    outPath
+  } = options;
 
   // 判断上传文件临时存放文件夹是否存在，不存在则创建此文件夹
   downloadDir = outPath || path.join(__dirname, `../../public/download`);
@@ -471,7 +475,7 @@ const generateFont = (options, done) => {
 
   const file = path.resolve(outputDir + '/fonts/', `${iconDefaultcfg.fontfileName}.svg`);
   fontStream = new SVGIcons2SVGFontStream({
-    fontName: 'ifont',
+    fontName: iconDefaultcfg.fontfileName,
     normalize: true
   })
 
@@ -482,7 +486,7 @@ const generateFont = (options, done) => {
     .on('finish', function() { // 写入成功
       console.log('Font successfully created!', path.resolve(outputDir, `${iconDefaultcfg.fontfileName}.svg`));
       // console.log(fs.readFileSync(file, 'utf8'))
-      // createTtf(file, outputDir, done);
+      createTtf(file, outputDir, done);
     })
     .on('error', function(err) { // 写入失败
       console.log('fontStream err', err);
