@@ -17,7 +17,7 @@ const webfontsGenerator = require('webfonts-generator');
 const SVGIcons2SVGFontStream = require('svgicons2svgfont');
 const UNICODE_PUA_START = 0xF101; //初始unicode源值
 
-var fontStream, downloadDir, newDownloadDir;
+var fontStream, downloadDir;
 var iconfontName = 'wiifont';
 
 /**
@@ -51,108 +51,112 @@ const ScanList = (list) => {
  */
 const optimizeSvg = (iconDefaultcfg) => {
   iconDefaultcfg = iconDefaultcfg || {};
-  var files = [];
-  for (let i in iconDefaultcfg.charmap) {
-    files.push('public' + iconDefaultcfg.charmap[i].file);
-  }
+  return new Promise((resolve, reject) => {
+    var files = [];
+    for (let i in iconDefaultcfg.charmap) {
+      files.push('public' + iconDefaultcfg.charmap[i].file);
+    }
 
-  async.map(files, function(file, fileDone) {
-    var svg = fs.readFileSync(file, 'utf8');
-    var svgo = new SVGO({
-      plugins: [{
-        cleanupAttrs: true,
-      }, {
-        removeDoctype: true,
-      }, {
-        removeXMLProcInst: true,
-      }, {
-        removeComments: true,
-      }, {
-        removeMetadata: true,
-      }, {
-        removeTitle: true,
-      }, {
-        removeDesc: true,
-      }, {
-        removeUselessDefs: true,
-      }, {
-        removeEditorsNSData: true,
-      }, {
-        removeEmptyAttrs: true,
-      }, {
-        removeHiddenElems: true,
-      }, {
-        removeEmptyText: true,
-      }, {
-        removeEmptyContainers: true,
-      }, {
-        removeViewBox: false,
-      }, {
-        cleanupEnableBackground: true,
-      }, {
-        convertStyleToAttrs: true,
-      }, {
-        convertColors: true,
-      }, {
-        convertPathData: true,
-      }, {
-        convertTransform: true,
-      }, {
-        removeUnknownsAndDefaults: true,
-      }, {
-        removeNonInheritableGroupAttrs: true,
-      }, {
-        removeUselessStrokeAndFill: true,
-      }, {
-        removeUnusedNS: true,
-      }, {
-        cleanupIDs: true,
-      }, {
-        cleanupNumericValues: true,
-      }, {
-        moveElemsAttrsToGroup: true,
-      }, {
-        moveGroupAttrsToElems: true,
-      }, {
-        collapseGroups: true,
-      }, {
-        removeRasterImages: false,
-      }, {
-        mergePaths: true,
-      }, {
-        convertShapeToPath: true,
-      }, {
-        sortAttrs: true,
-      }, {
-        removeDimensions: true,
-      }, {
-        removeAttrs: {
-          attrs: '(stroke|fill)'
-        },
-      }]
-    });
-    try {
-      svgo.optimize(svg).then(function(res) {
-        var stream = new MemoryStream(res.data, {
-          writable: false
-        });
-        console.log(svg)
-        console.log(stream.toString());
-
-        fileDone(null, {
-          stream: stream
-        });
+    async.map(files, function(file, fileDone) {
+      var svg = fs.readFileSync(file, 'utf8');
+      var svgo = new SVGO({
+        plugins: [{
+          cleanupAttrs: true,
+        }, {
+          removeDoctype: true,
+        }, {
+          removeXMLProcInst: true,
+        }, {
+          removeComments: true,
+        }, {
+          removeMetadata: true,
+        }, {
+          removeTitle: true,
+        }, {
+          removeDesc: true,
+        }, {
+          removeUselessDefs: true,
+        }, {
+          removeEditorsNSData: true,
+        }, {
+          removeEmptyAttrs: true,
+        }, {
+          removeHiddenElems: true,
+        }, {
+          removeEmptyText: true,
+        }, {
+          removeEmptyContainers: true,
+        }, {
+          removeViewBox: false,
+        }, {
+          cleanupEnableBackground: true,
+        }, {
+          convertStyleToAttrs: true,
+        }, {
+          convertColors: true,
+        }, {
+          convertPathData: true,
+        }, {
+          convertTransform: true,
+        }, {
+          removeUnknownsAndDefaults: true,
+        }, {
+          removeNonInheritableGroupAttrs: true,
+        }, {
+          removeUselessStrokeAndFill: true,
+        }, {
+          removeUnusedNS: true,
+        }, {
+          cleanupIDs: true,
+        }, {
+          cleanupNumericValues: true,
+        }, {
+          moveElemsAttrsToGroup: true,
+        }, {
+          moveGroupAttrsToElems: true,
+        }, {
+          collapseGroups: true,
+        }, {
+          removeRasterImages: false,
+        }, {
+          mergePaths: true,
+        }, {
+          convertShapeToPath: true,
+        }, {
+          sortAttrs: true,
+        }, {
+          removeDimensions: true,
+        }, {
+          removeAttrs: {
+            attrs: '(stroke|fill)'
+          },
+        }]
       });
-    } catch (err) {
-      console.log(err);
-      fileDone(err);
-    }
-  }, function(err, streams) {
-    if (err) {
-      log.error('Can’t simplify SVG file with SVGO.\n\n' + err);
-    } else {
-      createSvg(streams, iconDefaultcfg);
-    }
+      try {
+        svgo.optimize(svg).then(function(res) {
+          var stream = new MemoryStream(res.data, {
+            writable: false
+          });
+
+          fileDone(null, {
+            stream: stream
+          });
+        });
+      } catch (err) {
+        console.log(err);
+        fileDone(err);
+      }
+    }, function(err, streams) {
+      if (err) {
+        log.error('Can’t simplify SVG file with SVGO.\n\n' + err);
+        reject(err);
+      } else {
+        resolve({
+          streams: streams,
+          iconDefaultcfg: iconDefaultcfg
+        });
+      }
+    });
   });
 }
 
@@ -167,7 +171,6 @@ const createSvg = (streams, iconDefaultcfg) => {
   iconDefaultcfg = iconDefaultcfg || {};
 
   let startUicode = UNICODE_PUA_START; //设置字体起始code
-
   for (let i in streams) {
     let charConfig = iconDefaultcfg.charmap[i];
     const glyph = streams[i].stream;
@@ -187,46 +190,9 @@ const createSvg = (streams, iconDefaultcfg) => {
       name: matches[2].split('-')[0]
     };
     fontStream.write(glyph);
-    // console.log(glyph)
   }
   fontStream.end();
 };
-
-/**
- * 创建svg文件
- * @Author   Warrenyang
- * @DateTime 2018-10-16
- * @version  [version]
- * @param    {Object}   iconDefaultcfg 默认配置
- */
-// const createSvg = (iconDefaultcfg) => {
-//   iconDefaultcfg = iconDefaultcfg || {};
-
-//   optimizeSvg(iconDefaultcfg)
-
-//   let startUicode = UNICODE_PUA_START; //设置字体起始code
-
-//   for (let i in iconDefaultcfg.charmap) {
-//     let charConfig = iconDefaultcfg.charmap[i];
-//     const glyph = fs.createReadStream('public' + charConfig.file);
-
-//     const basename = path.basename(charConfig.file);
-//     const matches = basename.match(/^(?:((?:u[0-9a-f]{4,6},?)+)-)?(.+)\.svg$/i);
-//     let unicode = String.fromCodePoint(startUicode);
-//     iconDefaultcfg.charmap[i] = {
-//       cssCode: `${UTIL.encodeUnicode(unicode)}`,
-//       name: matches[2].split('-')[0]
-//     }
-//     startUicode++;
-
-//     glyph.metadata = {
-//       unicode: [unicode],
-//       name: matches[2].split('-')[0]
-//     };
-//     fontStream.write(glyph);
-//   }
-//   fontStream.end();
-// };
 
 /**
  * 生成TTF文件
@@ -429,6 +395,23 @@ const createDemoZip = (outputDir, done) => {
   });
 }
 
+const listenFontPipe = (file, outputDir, iconConfig) => {
+  return new Promise((resolve, reject) => {
+    fontStream.pipe(fs.createWriteStream(file))
+      .on('finish', function() { // 写入成功
+        console.log('Font successfully created!', path.resolve(outputDir, `${iconConfig.fontfileName}.svg`));
+        resolve({
+          file: file, 
+          outputDir: outputDir
+        });
+      })
+      .on('error', function(err) { // 写入失败
+        reject(err)
+        console.log('fontStream err', err);
+      });
+  })
+}
+
 /**
  * 生成字体的main函数
  * @Author   Warrenyang
@@ -444,7 +427,7 @@ const generateFont = (options, done) => {
     outPath
   } = options;
 
-  // 判断上传文件临时存放文件夹是否存在，不存在则创建此文件夹
+  // 判断上传文件临时存放文件夹是否存在，不存在则创建此文件夹，完成生成后删除该文件夹
   downloadDir = outPath || path.join(__dirname, `../../public/download`);
   if (!fs.existsSync(downloadDir)) {
     fs.mkdirSync(downloadDir);
@@ -453,7 +436,8 @@ const generateFont = (options, done) => {
   iconfontName = fontName;
   iconDefaultcfg.fontfileName = fontName;
 
-  newDownloadDir = `${iconfontName}_${UTIL.UUID()}`;
+  // 新建导出文件夹
+  let newDownloadDir = `${iconfontName}_${UTIL.UUID()}`;
   const dayFlag = UTIL.format(new Date(), 'yyyyMMdd');
   const dayDownLoadDir = `${downloadDir}/${dayFlag}`;
   if (!fs.existsSync(dayDownLoadDir)) {
@@ -462,40 +446,50 @@ const generateFont = (options, done) => {
     fs.mkdirSync(dayDownLoadDir);
   }
   const outputDir = `${dayDownLoadDir}/${newDownloadDir}`;
-
   fs.mkdirSync(outputDir);
-
-  if (!fs.existsSync(outputDir + '/fonts/')) {
+  if(!fs.existsSync(outputDir + '/fonts/')) {
     fs.mkdirSync(outputDir + '/fonts/');
   }
 
   const list = files;
   iconDefaultcfg.charmap = [];
+
+  // 遍历svg图片，并加入iconDefaultcfg中
   ScanList(list);
 
+  // 配置svg集合文件的路径和文件名
   const file = path.resolve(outputDir + '/fonts/', `${iconDefaultcfg.fontfileName}.svg`);
+  // 新建SVGIcons2SVGFontStream对象，准备svg图片转svg字体
   fontStream = new SVGIcons2SVGFontStream({
     fontName: iconDefaultcfg.fontfileName,
     normalize: true
   })
 
-  /*
-  监听写入svg
-   */
-  fontStream.pipe(fs.createWriteStream(file))
-    .on('finish', function() { // 写入成功
-      console.log('Font successfully created!', path.resolve(outputDir, `${iconDefaultcfg.fontfileName}.svg`));
-      // console.log(fs.readFileSync(file, 'utf8'))
-      createTtf(file, outputDir, done);
-    })
-    .on('error', function(err) { // 写入失败
-      console.log('fontStream err', err);
-    });
+  // 监听写入svg
+  // fontStream.pipe(fs.createWriteStream(file))
+  //   .on('finish', function() { // 写入成功
+  //     console.log('Font successfully created!', path.resolve(outputDir, `${iconDefaultcfg.fontfileName}.svg`));
+  //     createTtf(file, outputDir, done);
+  //   })
+  //   .on('error', function(err) { // 写入失败
+  //     console.log('fontStream err', err);
+  //   });
 
-  // createSvg(iconDefaultcfg);
 
-  // 开始压缩svg
-  optimizeSvg(iconDefaultcfg);
+  // 转换入口
+  let svgTrans = async function() {
+    let optimizeRes = await optimizeSvg(iconDefaultcfg);
+    createSvg(optimizeRes.streams, optimizeRes.iconDefaultcfg);
+
+    let fontPipeRes = await listenFontPipe(file, outputDir, iconDefaultcfg);
+    createTtf(fontPipeRes.file, fontPipeRes.outputDir, done);
+  }
+
+  // 执行转换
+  svgTrans().catch((err) => {
+    console.log(err)
+  });
+
 };
 
 exports.generateFont = generateFont;

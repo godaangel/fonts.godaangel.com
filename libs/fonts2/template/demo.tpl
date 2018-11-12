@@ -9,17 +9,17 @@
 html,body,ul,li,h3,p{padding:0;margin:0;}
 ul,li{list-style:none;}
 .main{width:985px;margin:20px auto 0;}
-.glyfList{margin-bottom:30px;overflow:hidden;}
-.glyf {
+.fontsList{margin-bottom:30px;overflow:hidden;}
+.fonts {
     width: 10%;
     float: left;
 }
-.glyf > div {
+.fonts > div {
     border-bottom: 1px solid #ccc;
     border-right: 1px solid #ccc;
     text-align: center;
 }
-.glyf h3 {
+.fonts h3 {
     text-align: center;
     padding: 3px;
     font-size: 14px;
@@ -38,9 +38,9 @@ ul,li{list-style:none;}
 <div class="main">
 	<h1><%= fontfileName %></h1>
 	<h2>预览 Preview</h2>
-	<ul class="glyfList" id="glyfList">
+	<ul class="fontsList" id="fontsList">
 	<% for (let i = 0; i < charmap.length; i++) { %>
-	<li class="glyf" data-id="<%=charmap[i].name%>">
+	<li class="fonts" data-id="<%=charmap[i].name%>">
     <div>
       <h3><%=charmap[i].cssCode%></h3>
       <div class="<%= fontfileName %> <%= fontfileName %>-<%=charmap[i].name%>"></div>
